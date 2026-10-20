@@ -1,0 +1,29 @@
+[2026-10-20 07:50:20] {
+    "Body":  {
+                 "stkCallback":  {
+                                     "ResultCode":  0,
+                                     "CheckoutRequestID":  "ws_CO_20261020075020_67474",
+                                     "CallbackMetadata":  {
+                                                              "Item":  [
+                                                                           {
+                                                                               "Value":  210,
+                                                                               "Name":  "Amount"
+                                                                           },
+                                                                           {
+                                                                               "Value":  "QKL89XX21M",
+                                                                               "Name":  "MpesaReceiptNumber"
+                                                                           },
+                                                                           {
+                                                                               "Value":  20261020104800,
+                                                                               "Name":  "TransactionDate"
+                                                                           },
+                                                                           {
+                                                                               "Value":  254712345678,
+                                                                               "Name":  "PhoneNumber"
+                                                                           }
+                                                                       ]
+                                                          },
+                                     "ResultDesc":  "The service request is processed successfully."
+                                 }
+             }
+}
