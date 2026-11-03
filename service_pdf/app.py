@@ -37,7 +37,8 @@ def generate_receipt():
     # 1. Generate High-Definition QR Code
     qr_filename = f"qr_{receipt_num}.png"
     qr_path = os.path.join(STORAGE_DIR, qr_filename)
-    verify_url = f"http://localhost:8000/verify.php?id={receipt_num}"
+    public_base_url = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("/")
+    verify_url = f"{public_base_url}/verify.php?id={receipt_num}"
 
     qr = qrcode.QRCode(version=1, box_size=5, border=1)
     qr.add_data(verify_url)
