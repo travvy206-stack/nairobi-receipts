@@ -26,7 +26,7 @@ class MpesaDarajaService {
         $this->consumerSecret = $db->getEnv('MPESA_CONSUMER_SECRET', '');
         $this->globalPasskey = $db->getEnv('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'); // Safaricom standard sandbox passkey
         $this->globalShortcode = $db->getEnv('MPESA_SHORTCODE', '174379');
-        $this->callbackUrl = $db->getEnv('MPESA_CALLBACK_URL', 'http://localhost:8000/api/mpesa_callback.php');
+        $this->callbackUrl = $db->getEnv('MPESA_CALLBACK_URL', 'https://nairobi-receipts.onrender.com/api/mpesa_callback.php');
     }
 
     private function getBaseUrl(): string {

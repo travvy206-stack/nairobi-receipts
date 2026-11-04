@@ -72,13 +72,24 @@ class Database {
                 $dbname = $this->getEnv('DB_DATABASE', 'nairobi_traders');
                 $user = $this->getEnv('DB_USERNAME', 'root');
                 $pass = $this->getEnv('DB_PASSWORD', '');
+                $sslMode = strtolower($this->getEnv('DB_SSL_MODE', 'preferred'));
 
                 $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-                $this->connection = new PDO($dsn, $user, $pass, [
+                $options = [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                ]);
+                ];
+
+                // Cloud MySQL providers (Aiven, TiDB Cloud, PlanetScale, DigitalOcean, etc.) require or support SSL
+                if ($sslMode === 'require' || $sslMode === 'required' || $sslMode === 'true' || !empty($this->getEnv('DB_SSL_CA', ''))) {
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false; // Prevents self-signed cloud cert issues
+                    if (!empty($this->getEnv('DB_SSL_CA', ''))) {
+                        $options[PDO::MYSQL_ATTR_SSL_CA] = $this->getEnv('DB_SSL_CA');
+                    }
+                }
+
+                $this->connection = new PDO($dsn, $user, $pass, $options);
             } else {
                 throw new InvalidArgumentException("Unsupported database driver: $driver");
             }

@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     supervisor \
     curl \
     git \
-    && docker-php-ext-install pdo pdo_sqlite \
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
