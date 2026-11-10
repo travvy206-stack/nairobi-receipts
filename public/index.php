@@ -81,6 +81,8 @@ $recentReceipts = $stmtRecent->fetchAll();
         }
         .pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
+    <link rel="stylesheet" href="/assets/theme.css">
+    <script src="/assets/theme.js"></script>
 </head>
 <body class="min-h-full bg-[#0d0f12] text-slate-100 flex flex-col antialiased">
 
@@ -105,18 +107,23 @@ $recentReceipts = $stmtRecent->fetchAll();
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="theme-toggle-btn p-2 rounded-xl bg-[#1a1e26] hover:bg-[#232834] text-xs font-semibold text-slate-300 border border-zinc-800 transition flex items-center justify-center" title="Toggle Light/Dark Theme">
+                    <svg class="w-4 h-4 text-amber-400 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg class="w-4 h-4 text-cyan-400 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
                 <button onclick="openAccountModal()" class="px-2.5 py-1.5 rounded-xl bg-[#1a1e26] hover:bg-[#232834] text-xs font-semibold text-slate-300 border border-zinc-800 transition flex items-center space-x-1">
                     <svg class="w-3.5 h-3.5 text-neon-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    <span>M-Pesa Setup</span>
+                    <span class="hidden sm:inline">M-Pesa Setup</span>
                 </button>
                 <?php if ($auth->isAdmin()): ?>
-                    <a href="/admin/dashboard.php" class="px-3 py-1.5 rounded-xl bg-[#1a1e26] hover:bg-[#232834] text-xs font-semibold text-neon-cyan border border-zinc-800 transition flex items-center space-x-1.5">
+                    <a href="/admin/dashboard.php" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#1a1e26] hover:bg-[#232834] text-xs font-semibold text-neon-cyan border border-zinc-800 transition flex items-center space-x-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         <span>Admin</span>
                     </a>
                 <?php endif; ?>
-                <a href="/logout.php" class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/30 transition flex items-center space-x-1">
+                <a href="/logout.php" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/30 transition flex items-center space-x-1">
                     <span>Sign Out</span>
                 </a>
             </div>
