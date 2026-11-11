@@ -148,6 +148,13 @@ $csrfToken = $auth->getCsrfToken();
                     </button>
                 </div>
             </form>
+
+            <div class="mt-6 text-center pt-4 border-t border-zinc-800/80">
+                <p class="text-xs text-slate-400">
+                    New Business Owner? 
+                    <a href="/register.php" class="text-neon-lime hover:underline font-bold">Register Admin & Store</a>
+                </p>
+            </div>
         </div>
 
         <!-- Footer -->
