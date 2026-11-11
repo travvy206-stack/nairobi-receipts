@@ -126,11 +126,8 @@ try {
     // E. Determine Simulation vs. Real Callback Mode
     $isSimulator = filter_var(Database::getInstance()->getEnv('MPESA_SIMULATOR_MODE', 'true'), FILTER_VALIDATE_BOOLEAN);
 
-    // If client provided a simulated PIN confirmation or simulator is active and prompt confirmed
-    $confirmPin = $input['confirm_pin'] ?? false;
-
-    // In Real Mode (without user PIN confirm action): Await Safaricom Webhook Callback
-    if (!$isSimulator && !$confirmPin) {
+    // In Real Mode: Await Safaricom Webhook Callback
+    if (!$isSimulator) {
         echo json_encode([
             'status' => 'pending',
             'message' => 'Awaiting customer PIN entry on mobile phone (Safaricom Daraja)...',
@@ -140,8 +137,8 @@ try {
         exit;
     }
 
-    // In Simulator Mode: wait for client confirmation or after 2s if auto
-    if (!$confirmPin && $elapsedSeconds < 2) {
+    // In Simulator Mode: Hold for 2.5s then simulate confirmation
+    if ($elapsedSeconds < 2) {
         echo json_encode([
             'status' => 'pending',
             'message' => 'Awaiting M-Pesa PIN entry on customer phone...',
@@ -187,11 +184,10 @@ try {
     if ($httpCode === 200 && ($resData = json_decode($response, true)) && ($resData['status'] ?? '') === 'success') {
         $pdfUrl = $resData['pdf_url'];
         $qrUrl = $resData['qr_url'];
-        $mpesaCode = 'SHB' . strtoupper(bin2hex(random_bytes(3))) . rand(10, 99);
 
         $db->beginTransaction();
-        $stmtUp = $db->prepare("UPDATE receipts SET payment_status = 'completed', mpesa_receipt_number = COALESCE(mpesa_receipt_number, ?), pdf_path = ?, qr_code_path = ? WHERE id = ?");
-        $stmtUp->execute([$mpesaCode, $pdfUrl, $qrUrl, (int)$receipt['id']]);
+        $stmtUp = $db->prepare("UPDATE receipts SET payment_status = 'completed', pdf_path = ?, qr_code_path = ? WHERE id = ?");
+        $stmtUp->execute([$pdfUrl, $qrUrl, (int)$receipt['id']]);
 
         $stmtCust = $db->prepare("UPDATE customers SET total_spent = total_spent + ? WHERE id = ?");
         $stmtCust->execute([(float)$receipt['total_amount'], (int)$receipt['customer_table_id']]);

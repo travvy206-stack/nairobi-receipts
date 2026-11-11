@@ -383,57 +383,61 @@ $recentReceipts = $stmtRecent->fetchAll();
         <div class="bg-[#14171d] border border-zinc-800 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl relative">
             
             <!-- STEP B: LOCKED PAYMENT PENDING STATE -->
-            <div id="modal-state-processing" class="space-y-4 text-center">
+            <div id="modal-state-processing" class="space-y-6 text-center">
                 
-                <!-- Authentic Interactive On-Screen Safaricom M-Pesa STK Prompt -->
-                <div class="bg-[#1b5e20] text-white rounded-2xl p-5 shadow-2xl border border-green-500/40 text-left">
-                    <div class="flex items-center justify-between pb-3 border-b border-green-400/30">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-xs font-black tracking-widest uppercase">Lipa na M-PESA</span>
-                        </div>
-                        <span class="text-[10px] bg-green-950/60 text-green-300 px-2 py-0.5 rounded-full font-mono">STK Prompt</span>
+                <!-- Radar Pulse Animation -->
+                <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-neon-lime/20 pulse-ring"></div>
+                    <div class="w-12 h-12 rounded-full bg-neon-lime/10 border border-neon-lime/40 text-neon-lime flex items-center justify-center font-bold">
+                        <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
                     </div>
+                </div>
 
-                    <div class="py-3 text-xs space-y-1.5 font-medium text-green-100">
-                        <p>Pay <span id="prompt-amount" class="text-white font-extrabold text-sm">KES 0.00</span> to <span id="prompt-store" class="text-white font-bold">Stall #104</span>?</p>
-                        <p class="text-[11px] text-green-200">Account: <span id="prompt-account" class="font-mono font-bold text-white"><?= $activeType ?> #<?= htmlspecialchars($activeShortcode) ?></span></p>
-                    </div>
-
-                    <form onsubmit="submitMpesaPin(event)" class="mt-2 space-y-3">
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-green-200 mb-1">Enter M-Pesa PIN:</label>
-                            <input type="password" id="customer_pin_input" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required autofocus
-                                class="w-full text-center tracking-[0.5em] text-lg font-black py-2.5 px-3 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 font-mono shadow-inner">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <button type="button" onclick="cancelPayment()" class="py-2 rounded-xl bg-green-900/60 hover:bg-green-900 text-green-200 text-xs font-bold transition">
-                                Cancel
-                            </button>
-                            <button type="submit" id="btn-submit-pin" class="py-2 rounded-xl bg-white hover:bg-green-50 text-[#1b5e20] text-xs font-black shadow-md transition flex items-center justify-center space-x-1">
-                                <span>Send PIN</span>
-                            </button>
-                        </div>
-                    </form>
+                <div>
+                    <h3 class="text-lg font-black uppercase tracking-wider text-white">Payment In Progress</h3>
+                    <p class="text-xs text-neon-lime font-mono mt-1">Awaiting M-Pesa PIN entry on customer phone...</p>
                 </div>
 
                 <!-- Transaction Lockdown Telemetry -->
-                <div class="space-y-1.5 text-left bg-[#0d0f12] border border-zinc-800 rounded-2xl p-3 text-xs font-mono">
+                <div class="space-y-2 text-left bg-[#0d0f12] border border-zinc-800 rounded-2xl p-4 text-xs font-mono">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Amount Due:</span>
+                        <span id="modal-amount" class="font-bold text-neon-lime text-sm">KES 0.00</span>
+                    </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500">Customer Mobile:</span>
                         <span id="modal-phone" class="font-bold text-white">+254...</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500">Status:</span>
-                        <span id="prompt-status-msg" class="text-neon-lime text-[11px]">Awaiting 4-digit PIN confirmation...</span>
+                        <span class="text-slate-500">Depositing To:</span>
+                        <span id="modal-destination" class="font-bold text-neon-cyan"><?= $activeType ?> #<?= htmlspecialchars($activeShortcode) ?></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Checkout Reference:</span>
+                        <span id="modal-checkout-id" class="text-slate-400 text-[11px]">ws_CO_...</span>
                     </div>
                 </div>
 
                 <!-- 60-Second Countdown Timer -->
-                <div class="bg-[#1a1e26] border border-zinc-800 rounded-xl p-2.5 flex items-center justify-between">
-                    <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">PIN Expiry:</span>
-                    <span id="modal-countdown" class="text-sm font-black text-rose-400 mono">01:00</span>
+                <div class="bg-[#1a1e26] border border-zinc-800 rounded-2xl p-3 flex items-center justify-between">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">PIN Expiry Window:</span>
+                    <span id="modal-countdown" class="text-lg font-black text-rose-400 mono">01:00</span>
+                </div>
+
+                <!-- Lockdown Notice -->
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium flex items-center justify-center space-x-2">
+                    <span class="font-bold text-amber-400">&bull;</span>
+                    <span>Receipt minting locked until Safaricom settlement confirmation</span>
+                </div>
+
+                <!-- Manual Cancellation Control -->
+                <div class="pt-2">
+                    <button onclick="cancelPayment()" class="w-full py-2.5 rounded-xl bg-[#1a1e26] hover:bg-[#232834] text-slate-300 text-xs font-semibold border border-zinc-800 transition">
+                        Cancel Transaction Request
+                    </button>
                 </div>
             </div>
 
@@ -664,19 +668,9 @@ $recentReceipts = $stmtRecent->fetchAll();
             const total = cart.reduce((sum, i) => sum + (i.quantity * i.unit_price), 0);
 
             // Open Lockdown Modal
+            document.getElementById('modal-amount').textContent = `KES ${total.toFixed(2)}`;
             document.getElementById('modal-phone').textContent = phone;
-            document.getElementById('prompt-amount').textContent = `KES ${total.toFixed(2)}`;
-            const destBadge = document.getElementById('badge-account-info').textContent;
-            const storeBadge = document.getElementById('badge-store-name').textContent;
-            document.getElementById('prompt-account').textContent = destBadge;
-            document.getElementById('prompt-store').textContent = storeBadge;
-            document.getElementById('prompt-status-msg').textContent = 'Awaiting 4-digit PIN confirmation...';
-            const pinInput = document.getElementById('customer_pin_input');
-            if (pinInput) {
-                pinInput.value = '';
-                pinInput.disabled = false;
-                setTimeout(() => pinInput.focus(), 200);
-            }
+            document.getElementById('modal-checkout-id').textContent = 'Connecting Safaricom gateway...';
             document.getElementById('modal-state-processing').classList.remove('hidden');
             document.getElementById('modal-state-success').classList.add('hidden');
             document.getElementById('payment-modal').classList.remove('hidden');
@@ -711,9 +705,9 @@ $recentReceipts = $stmtRecent->fetchAll();
                 }
 
                 activePayment = data;
+                document.getElementById('modal-checkout-id').textContent = data.checkout_request_id;
                 if (data.destination) {
-                    document.getElementById('prompt-account').textContent = `${data.destination.type.toUpperCase()} #${data.destination.shortcode}`;
-                    document.getElementById('prompt-store').textContent = data.destination.store_name || storeBadge;
+                    document.getElementById('modal-destination').textContent = `${data.destination.type.toUpperCase()} #${data.destination.shortcode}`;
                 }
 
                 // STEP B: REAL-TIME POLLING EVERY 2 SECONDS
@@ -774,41 +768,6 @@ $recentReceipts = $stmtRecent->fetchAll();
                 }
             } catch (err) {
                 console.warn('Polling check error:', err);
-            }
-        }
-
-        async function submitMpesaPin(e) {
-            e.preventDefault();
-            const pinInput = document.getElementById('customer_pin_input');
-            const pin = pinInput ? pinInput.value.trim() : '';
-            if (pin.length !== 4) {
-                showToast('Please enter a valid 4-digit M-Pesa PIN.');
-                return;
-            }
-
-            document.getElementById('prompt-status-msg').textContent = 'Authenticating PIN with Safaricom network...';
-            const btnSubmit = document.getElementById('btn-submit-pin');
-            if (btnSubmit) {
-                btnSubmit.disabled = true;
-                btnSubmit.innerHTML = 'Verifying...';
-            }
-            if (pinInput) pinInput.disabled = true;
-
-            // Immediately send PIN confirmation to settlement engine
-            if (activePayment) {
-                try {
-                    await fetch('/api/check_payment_status.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            checkout_request_id: activePayment.checkout_request_id,
-                            receipt_id: activePayment.receipt_id,
-                            confirm_pin: true
-                        })
-                    });
-                } catch (err) {
-                    console.warn('PIN settlement push error:', err);
-                }
             }
         }
 
