@@ -44,11 +44,14 @@ class MpesaDarajaService {
         }
 
         if (empty($this->consumerKey) || empty($this->consumerSecret)) {
+            error_log("[NTA-Pay][Daraja] OAuth SKIPPED: consumer key/secret not set");
             return null;
         }
 
         $url = $this->getBaseUrl() . '/oauth/v1/generate?grant_type=client_credentials';
         $credentials = base64_encode($this->consumerKey . ':' . $this->consumerSecret);
+
+        error_log("[NTA-Pay][Daraja] OAuth request → $url");
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -61,14 +64,24 @@ class MpesaDarajaService {
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
         curl_close($ch);
+
+        if ($curlErr) {
+            error_log("[NTA-Pay][Daraja] OAuth CURL ERROR: $curlErr");
+            return null;
+        }
+
+        error_log("[NTA-Pay][Daraja] OAuth response HTTP $httpCode: $response");
 
         if ($httpCode === 200 && $data = json_decode($response, true)) {
             $this->cachedToken = $data['access_token'];
             $this->tokenExpiry = time() + (int)($data['expires_in'] ?? 3599) - 60;
+            error_log("[NTA-Pay][Daraja] OAuth token obtained OK, expires in " . ($data['expires_in'] ?? '?') . "s");
             return $this->cachedToken;
         }
 
+        error_log("[NTA-Pay][Daraja] OAuth FAILED HTTP $httpCode");
         return null;
     }
 
@@ -89,6 +102,7 @@ class MpesaDarajaService {
 
         // In Simulator Mode (or if keys are unconfigured)
         if ($this->isSimulator || empty($this->consumerKey) || empty($this->consumerSecret)) {
+            error_log("[NTA-Pay][Daraja] SIMULATOR MODE: generating mock checkout for $type #$shortcode KES $amount");
             $mockCheckoutId = "ws_CO_" . date('YmdHis') . "_" . rand(10000, 99999);
             return [
                 'success' => true,
@@ -101,6 +115,7 @@ class MpesaDarajaService {
         }
 
         // Live / Sandbox Daraja API Execution
+        error_log("[NTA-Pay][Daraja] STK Push: shortcode=$shortcode type=$type phone=$phone amount=$amount");
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
             return [
@@ -128,6 +143,7 @@ class MpesaDarajaService {
         ];
 
         $url = $this->getBaseUrl() . '/mpesa/stkpush/v1/processrequest';
+        error_log("[NTA-Pay][Daraja] STK Push request → $url callback=$this->callbackUrl");
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Authorization: Bearer ' . $accessToken,
@@ -145,8 +161,11 @@ class MpesaDarajaService {
         curl_close($ch);
 
         if ($curlErr) {
+            error_log("[NTA-Pay][Daraja] STK Push CURL ERROR: $curlErr");
             return ['success' => false, 'message' => 'Connection to Safaricom failed: ' . $curlErr];
         }
+
+        error_log("[NTA-Pay][Daraja] STK Push response HTTP $httpCode: $response");
 
         $resData = json_decode($response, true);
         if ($httpCode === 200 && isset($resData['ResponseCode']) && $resData['ResponseCode'] == '0') {
