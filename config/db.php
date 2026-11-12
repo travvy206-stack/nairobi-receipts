@@ -42,7 +42,16 @@ class Database {
     }
 
     public function getEnv(string $key, ?string $default = null): ?string {
-        return $this->env[$key] ?? $_ENV[$key] ?? getenv($key) ?: $default;
+        // OS/Render env vars take priority over .env file values
+        $osVal = getenv($key);
+        if ($osVal !== false && $osVal !== '') {
+            return $osVal;
+        }
+        if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+            return $_ENV[$key];
+        }
+        // Fall back to .env file, then default
+        return (!empty($this->env[$key])) ? $this->env[$key] : $default;
     }
 
     private function connect(): void {
