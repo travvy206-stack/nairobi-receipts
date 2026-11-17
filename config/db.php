@@ -90,12 +90,18 @@ class Database {
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ];
 
-                // Cloud MySQL providers (Aiven, TiDB Cloud, PlanetScale, DigitalOcean, etc.) require or support SSL
+                // Cloud MySQL providers (TiDB Cloud, PlanetScale, etc.) require SSL/TLS
                 if ($sslMode === 'require' || $sslMode === 'required' || $sslMode === 'true' || !empty($this->getEnv('DB_SSL_CA', ''))) {
-                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false; // Prevents self-signed cloud cert issues
-                    if (!empty($this->getEnv('DB_SSL_CA', ''))) {
-                        $options[PDO::MYSQL_ATTR_SSL_CA] = $this->getEnv('DB_SSL_CA');
+                    // Use explicit CA path if provided, otherwise fall back to system CA bundle
+                    $caPath = $this->getEnv('DB_SSL_CA', '');
+                    if (empty($caPath)) {
+                        // Debian/Ubuntu system CA bundle (present in php:8.2-cli-bookworm Docker image)
+                        $caPath = '/etc/ssl/certs/ca-certificates.crt';
                     }
+                    if (file_exists($caPath)) {
+                        $options[PDO::MYSQL_ATTR_SSL_CA] = $caPath;
+                    }
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
                 }
 
                 $this->connection = new PDO($dsn, $user, $pass, $options);
