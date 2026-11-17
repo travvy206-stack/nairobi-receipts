@@ -97,7 +97,7 @@ class MpesaDarajaService {
 
         // Resolve trader destination shortcode
         $shortcode = !empty($params['trader_shortcode']) ? trim($params['trader_shortcode']) : $this->globalShortcode;
-        $type = strtolower($params['trader_type'] ?? 'till');
+        $type = strtolower($params['trader_type'] ?? 'paybill');
         $passkey = !empty($params['trader_passkey']) ? trim($params['trader_passkey']) : $this->globalPasskey;
 
         // In Simulator Mode (or if keys are unconfigured)
